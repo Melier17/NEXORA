@@ -4,10 +4,6 @@
 
 Versioned endpoints use the prefix `/api/v1`.
 
-The initial endpoint is:
-
-- `GET /api/v1/health` — returns API status information.
-
 ## Request flow
 
 1. Apache forwards non-file requests to `backend/public/index.php`.
@@ -25,66 +21,37 @@ The initial endpoint is:
 - `App\\Core\\Response`: sends JSON responses with status and headers.
 - `App\\Core\\ApiException`: represents expected API errors with an HTTP status and optional field errors.
 - `App\\Validators\\Validator`: checks common input rules and returns field-level errors.
-- `App\\Middleware\\ErrorHandler`: logs exceptions and maps known API errors to safe JSON responses.
-- `App\\Controllers\\HealthController`: handles the initial health endpoint.
+- `App\\Repositories\\UserRepository`: reads and creates user records with prepared statements.
+- `App\\Services\\AuthService`: coordinates registration, login, and account lookup.
+- `App\\Services\\TokenService`: issues, validates, and revokes opaque bearer tokens.
+- `App\\Middleware\\ErrorHandler`: maps known API errors to safe JSON responses and logs unexpected exceptions.
 
-## Validation
+## Authentication endpoints
 
-The validator supports:
+| Method | Endpoint | Purpose |
+|---|---|---|
+| POST | `/api/v1/auth/register` | Create an account |
+| POST | `/api/v1/auth/login` | Sign in and issue an access token |
+| GET | `/api/v1/auth/me` | Return the authenticated user |
+| POST | `/api/v1/auth/logout` | Revoke the presented access token |
 
-- `required`
-- `string`
-- `email`
-- `integer`
-- `min:N` and `max:N` for string length or numeric value
-- `in:value1,value2`
+Registration expects a JSON object with `name`, `email`, `password`, and `password_confirmation`. Passwords must contain at least 12 characters and are hashed with PHP's `password_hash()`. Login uses `password_verify()`.
 
-Example:
+Protected requests send `Authorization: Bearer <token>`. Tokens are cryptographically random opaque values. The database stores only the SHA-256 hash, along with the user, expiry, and revocation timestamp. The default lifetime is 60 minutes, configurable through `ACCESS_TOKEN_TTL_MINUTES`.
 
-```php
-$errors = Validator::validate($request->body(), [
-    'name' => ['required', 'string', 'min:2', 'max:100'],
-    'email' => ['required', 'email'],
-]);
+The authentication migration `002_create_access_tokens.sql` must be applied after the initial schema migration. The legacy `refresh_tokens` table is reserved for a future refresh-token flow and is not used by this initial access-token implementation.
 
-if ($errors !== []) {
-    throw ApiException::validation($errors);
-}
-```
+## Validation and errors
 
-Validation is an application-level check; database constraints and authorization checks are still required.
+The validator supports `required`, `string`, `email`, `integer`, `min:N`, `max:N`, and `in:value1,value2`.
 
-## JSON response convention
-
-Successful response:
-
-```json
-{
-  "success": true,
-  "message": "Operation completed.",
-  "data": {}
-}
-```
-
-Validation error (HTTP 422):
-
-```json
-{
-  "success": false,
-  "message": "The submitted data is invalid.",
-  "errors": {
-    "email": ["Enter a valid email address."]
-  }
-}
-```
-
-Other expected API errors use the status code supplied to `ApiException`. Unexpected exceptions return HTTP 500 with a generic message. Detailed exception information is only included when `APP_DEBUG=true`; keep debug mode disabled in production.
+Validation failures return HTTP 422 with field-level messages. Invalid credentials return HTTP 401. Duplicate registration email returns HTTP 409. Unexpected exceptions return HTTP 500 with a generic message. Detailed exception information is only included when `APP_DEBUG=true`; keep debug mode disabled in production.
 
 ## Security notes
 
-- Controllers must not assume that a submitted ID belongs to the authenticated user.
-- Authorization must be checked for every workspace and project resource.
 - Never return password hashes, token hashes, secrets, or raw exception traces to clients.
-- Validate request data before calling services or repositories.
 - Use parameterized SQL through PDO.
+- Access tokens are stored as hashes and can be revoked on logout.
+- Authorization must be checked for every workspace and project resource.
+- Authentication endpoints still need production rate limiting and security testing.
 - Configure the production web root to `backend/public`, not the repository root.
