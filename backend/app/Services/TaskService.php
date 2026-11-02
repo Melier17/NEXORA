@@ -40,6 +40,7 @@ final class TaskService
         $this->validateAssignee($workspaceId, $data['assigned_to']);
 
         $taskId = $this->tasks->create($projectId, $userId, $data);
+        $this->logActivity($workspaceId, $userId, $taskId, 'task.created', ['project_id' => $projectId, 'title' => $data['title']]);
         return $this->requireTask($workspaceId, $taskId);
     }
 
@@ -66,6 +67,7 @@ final class TaskService
         }
 
         $this->tasks->update($taskId, $data);
+        $this->logActivity($workspaceId, $userId, $taskId, 'task.updated', ['fields' => array_keys($data)]);
         return $this->requireTask($workspaceId, $taskId);
     }
 
@@ -81,7 +83,23 @@ final class TaskService
             throw new ApiException('Only workspace managers or the task creator can delete this task.', 403);
         }
 
+        $this->logActivity($workspaceId, $userId, $taskId, 'task.deleted', ['title' => $task['title']]);
         $this->tasks->delete($taskId);
+    }
+
+    private function logActivity(int $workspaceId, int $userId, int $taskId, string $action, array $metadata): void
+    {
+        $statement = $this->database->prepare(
+            'INSERT INTO activity_logs (workspace_id, actor_user_id, entity_type, entity_id, action, metadata)
+             VALUES (:workspace_id, :actor_user_id, "task", :entity_id, :action, :metadata)'
+        );
+        $statement->execute([
+            'workspace_id' => $workspaceId,
+            'actor_user_id' => $userId,
+            'entity_id' => $taskId,
+            'action' => $action,
+            'metadata' => json_encode($metadata, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+        ]);
     }
 
     private function validatedData(array $input, bool $partial): array
