@@ -87,7 +87,7 @@ final class TaskService
     private function validatedData(array $input, bool $partial): array
     {
         $rules = [
-            'title' => [$partial ? 'string' : 'required', 'min:3', 'max:180'],
+            'title' => [$partial ? 'string' : 'required', 'string', 'min:3', 'max:180'],
             'description' => ['string', 'max:5000'],
             'status' => ['string', 'in:todo,in_progress,review,done'],
             'priority' => ['string', 'in:low,medium,high,urgent'],
@@ -95,6 +95,10 @@ final class TaskService
             'due_date' => ['string'],
         ];
         $errors = Validator::validate($input, $rules);
+
+        if (array_key_exists('title', $input) && (!is_string($input['title']) || trim($input['title']) === '')) {
+            $errors['title'][] = 'Task title must be a non-empty string.';
+        }
 
         if (array_key_exists('assigned_to', $input) && $input['assigned_to'] !== null && $input['assigned_to'] !== '') {
             if (filter_var($input['assigned_to'], FILTER_VALIDATE_INT) === false || (int) $input['assigned_to'] < 1) {
