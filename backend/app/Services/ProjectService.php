@@ -64,13 +64,18 @@ final class ProjectService
     private function validatedData(array $input, bool $partial): array
     {
         $rules = [
-            'name' => [$partial ? 'string' : 'required', 'min:3', 'max:160'],
+            'name' => [$partial ? 'string' : 'required', 'string', 'min:3', 'max:160'],
+
             'description' => ['string', 'max:4000'],
             'status' => ['string', 'in:planning,active,on_hold,completed,archived'],
             'start_date' => ['string'],
             'due_date' => ['string'],
         ];
         $errors = Validator::validate($input, $rules);
+
+        if (array_key_exists('name', $input) && (!is_string($input['name']) || trim($input['name']) === '')) {
+            $errors['name'][] = 'Project name must be a non-empty string.';
+        }
 
         foreach (['start_date', 'due_date'] as $field) {
             if (array_key_exists($field, $input) && $input[$field] !== null && $input[$field] !== '') {
@@ -99,6 +104,7 @@ final class ProjectService
         }
 
         if (!$partial) {
+            $data['name'] = trim((string) $data['name']);
             $data += [
                 'name' => trim((string) $input['name']),
                 'description' => null,
