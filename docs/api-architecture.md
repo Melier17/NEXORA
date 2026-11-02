@@ -15,16 +15,44 @@ The initial endpoint is:
 3. Dotenv loads local environment variables.
 4. The request abstraction normalizes the HTTP method, path, headers, query, and JSON body.
 5. The router matches the method and route.
-6. A controller handles the request and returns a response.
-7. The response object sends JSON with an HTTP status code.
+6. A controller validates input and delegates business work to services.
+7. A response object sends JSON with an HTTP status code.
 
 ## Core components
 
 - `App\\Core\\Request`: captures and normalizes an HTTP request.
 - `App\\Core\\Router`: registers routes and dispatches matching requests.
 - `App\\Core\\Response`: sends JSON responses with status and headers.
-- `App\\Middleware\\ErrorHandler`: logs unexpected exceptions and returns a safe error response.
+- `App\\Core\\ApiException`: represents expected API errors with an HTTP status and optional field errors.
+- `App\\Validators\\Validator`: checks common input rules and returns field-level errors.
+- `App\\Middleware\\ErrorHandler`: logs exceptions and maps known API errors to safe JSON responses.
 - `App\\Controllers\\HealthController`: handles the initial health endpoint.
+
+## Validation
+
+The validator supports:
+
+- `required`
+- `string`
+- `email`
+- `integer`
+- `min:N` and `max:N` for string length or numeric value
+- `in:value1,value2`
+
+Example:
+
+```php
+$errors = Validator::validate($request->body(), [
+    'name' => ['required', 'string', 'min:2', 'max:100'],
+    'email' => ['required', 'email'],
+]);
+
+if ($errors !== []) {
+    throw ApiException::validation($errors);
+}
+```
+
+Validation is an application-level check; database constraints and authorization checks are still required.
 
 ## JSON response convention
 
@@ -38,20 +66,19 @@ Successful response:
 }
 ```
 
-Error response:
+Validation error (HTTP 422):
 
 ```json
 {
   "success": false,
-  "message": "A safe explanation of the error."
+  "message": "The submitted data is invalid.",
+  "errors": {
+    "email": ["Enter a valid email address."]
+  }
 }
 ```
 
-The exact fields may be extended when pagination and validation errors are implemented.
-
-## Error handling
-
-Unexpected exceptions are logged on the server. Detailed exception information is only included when `APP_DEBUG=true`; keep debug mode disabled in production. Invalid JSON request bodies receive an HTTP 400 response.
+Other expected API errors use the status code supplied to `ApiException`. Unexpected exceptions return HTTP 500 with a generic message. Detailed exception information is only included when `APP_DEBUG=true`; keep debug mode disabled in production.
 
 ## Security notes
 
