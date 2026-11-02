@@ -25,7 +25,7 @@ final class Request
 
         // Remove the public directory prefix when the app runs in a subdirectory.
         $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-        $basePath = rtrim(str_replace('\\\\', '/', dirname($scriptName)), '/');
+        $basePath = rtrim(str_replace(chr(92), '/', dirname($scriptName)), '/');
 
         if ($basePath !== '' && $basePath !== '/' && str_starts_with($path, $basePath)) {
             $path = substr($path, strlen($basePath));
@@ -45,7 +45,7 @@ final class Request
             if ($rawBody !== '') {
                 try {
                     $decoded = json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
-                } catch (\\JsonException) {
+                } catch (\JsonException) {
                     throw new InvalidArgumentException('The request body contains invalid JSON.');
                 }
 
