@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101426">
+  <title>NEXORA — Gestión de proyectos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#"><span class="brand-mark">N</span><span>NEXORA</span></a>
+      <div class="workspace-switch"><span class="workspace-icon">A</span><span><small>ESPACIO DE TRABAJO</small><strong>Acme Studio</strong></span><span class="chevron">⌄</span></div>
+      <p class="nav-label">MENÚ PRINCIPAL</p>
+      <nav class="nav-list">
+        <a class="nav-link active" href="#overview" data-view="overview"><span>▦</span> Resumen</a>
+        <a class="nav-link" href="#projects" data-view="projects"><span>▣</span> Proyectos <i>4</i></a>
+        <a class="nav-link" href="#tasks" data-view="tasks"><span>☷</span> Mis tareas <i>8</i></a>
+        <a class="nav-link" href="#team" data-view="team"><span>♧</span> Equipo</a>
+      </nav>
+      <p class="nav-label second-label">ESPACIO DE TRABAJO</p>
+      <nav class="nav-list">
+        <a class="nav-link" href="#activity" data-view="activity"><span>◷</span> Actividad</a>
+        <a class="nav-link" href="#settings" data-view="settings"><span>⚙</span> Configuración</a>
+      </nav>
+      <div class="sidebar-bottom"><div class="help-card"><div class="help-icon">✦</div><strong>¿Necesitas ayuda?</strong><p>Explora cómo organizar mejor tu equipo.</p><a href="#help">Ver guía <span>↗</span></a></div>
+        <div class="profile"><div class="avatar purple">ML</div><span><strong>Melier López</strong><small>Administradora</small></span><span class="dots">···</span></div>
+      </div>
+    </aside>
+    <main class="main-content">
+      <header class="topbar"><button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">☰</button><div class="breadcrumb">Workspace <span>/</span> <strong id="crumb">Resumen</strong></div><div class="top-actions"><button class="icon-btn" aria-label="Notificaciones">♧<b></b></button><div class="avatar purple small">ML</div></div></header>
+      <section class="page" id="overview">
+        <div class="welcome-row"><div><div class="eyebrow">LUNES, 2 DE NOVIEMBRE DE 2026</div><h1>¡Hola, Melier! <span>✦</span></h1><p class="muted">Aquí tienes lo que está pasando en tu espacio de trabajo.</p></div><button class="primary-btn" id="newTaskBtn"><span>＋</span> Nueva tarea</button></div>
+        <div class="stats-grid">
+          <article class="stat-card"><div class="stat-top"><span>Proyectos activos</span><span class="stat-icon violet">▣</span></div><div class="stat-number">12</div><div class="stat-foot"><span class="trend">↗ 2</span> <span>respecto al mes pasado</span></div></article>
+          <article class="stat-card"><div class="stat-top"><span>Tareas completadas</span><span class="stat-icon green">✓</span></div><div class="stat-number">48</div><div class="stat-foot"><span class="trend">↗ 12%</span> <span>esta semana</span></div></article>
+          <article class="stat-card"><div class="stat-top"><span>En progreso</span><span class="stat-icon blue">◷</span></div><div class="stat-number" id="inProgressCount">08</div><div class="stat-foot"><span class="neutral-dot"></span> <span>tareas en curso</span></div></article>
+          <article class="stat-card"><div class="stat-top"><span>Miembros del equipo</span><span class="stat-icon orange">♧</span></div><div class="stat-number">06</div><div class="stat-foot"><span class="trend">+1</span> <span>nuevo integrante</span></div></article>
+        </div>
+        <div class="content-grid">
+          <section class="panel projects-panel" id="projects"><div class="panel-heading"><div><h2>Proyectos recientes</h2><p class="muted">Sigue el avance de tus proyectos.</p></div><a href="#projects" class="text-link">Ver todos <span>→</span></a></div>
+            <div class="project-list">
+              <article class="project-row"><div class="project-symbol violet-bg">✧</div><div class="project-info"><strong>Rediseño de plataforma</strong><small>Diseño · Producto</small><div class="progress-track"><span style="width:78%"></span></div></div><div class="project-meta"><strong>78%</strong><small>12/15 tareas</small></div><span class="status status-progress">En progreso</span></article>
+              <article class="project-row"><div class="project-symbol blue-bg">⌘</div><div class="project-info"><strong>Portal de clientes</strong><small>Desarrollo · Web</small><div class="progress-track"><span class="blue-progress" style="width:52%"></span></div></div><div class="project-meta"><strong>52%</strong><small>8/16 tareas</small></div><span class="status status-review">En revisión</span></article>
+              <article class="project-row"><div class="project-symbol orange-bg">◇</div><div class="project-info"><strong>Campaña de lanzamiento</strong><small>Marketing · Marca</small><div class="progress-track"><span class="orange-progress" style="width:34%"></span></div></div><div class="project-meta"><strong>34%</strong><small>5/14 tareas</small></div><span class="status status-planning">Planificación</span></article>
+            </div>
+          </section>
+          <section class="panel activity-panel" id="activity"><div class="panel-heading"><div><h2>Actividad reciente</h2><p class="muted">Lo último de tu equipo.</p></div><button class="more-btn" aria-label="Más opciones">···</button></div>
+            <div class="activity-list"><div class="activity-item"><div class="avatar mini pink">SA</div><div><p><strong>Sofía Álvarez</strong> completó una tarea</p><small>Actualizó la página de inicio</small><time>Hace 12 min</time></div></div><div class="activity-item"><div class="avatar mini blue">CR</div><div><p><strong>Carlos Ruiz</strong> comentó en</p><small>Portal de clientes</small><time>Hace 1 hora</time></div></div><div class="activity-item"><div class="avatar mini orange">LM</div><div><p><strong>Laura Méndez</strong> creó un proyecto</p><small>Campaña de lanzamiento</small><time>Hace 3 horas</time></div></div><div class="activity-item"><div class="avatar mini green">JP</div><div><p><strong>Juan Pérez</strong> se unió al equipo</p><small>Acme Studio</small><time>Ayer</time></div></div></div>
+          </section>
+        </div>
+        <section class="panel tasks-panel" id="tasks"><div class="panel-heading"><div><h2>Mis tareas</h2><p class="muted">Organiza lo que tienes pendiente.</p></div><div class="task-filters"><button class="filter-btn selected" data-filter="all">Todas</button><button class="filter-btn" data-filter="todo">Pendientes</button><button class="filter-btn" data-filter="done">Completadas</button></div></div>
+          <div class="task-table"><div class="task-table-head"><span>TAREA</span><span>PROYECTO</span><span>PRIORIDAD</span><span>ESTADO</span></div><div id="taskRows">
+            <div class="task-row" data-state="todo"><span class="task-name"><i class="check-circle"></i> Preparar estructura del dashboard</span><span class="task-project">Rediseño de plataforma</span><span><em class="priority high">Alta</em></span><span><em class="task-state pending">Pendiente</em></span></div>
+            <div class="task-row" data-state="todo"><span class="task-name"><i class="check-circle"></i> Revisar componentes UI</span><span class="task-project">Portal de clientes</span><span><em class="priority medium">Media</em></span><span><em class="task-state progress">En progreso</em></span></div>
+            <div class="task-row" data-state="done"><span class="task-name completed-name"><i class="check-circle checked">✓</i> Definir guía de estilos</span><span class="task-project">Rediseño de plataforma</span><span><em class="priority low">Baja</em></span><span><em class="task-state completed">Completada</em></span></div>
+          </div></div>
+        </section>
+        <footer class="footer-note"><span>© 2026 NEXORA</span><span>Organiza el trabajo. Impulsa tus ideas. <b>✦</b></span><span class="prototype-tag">PROTOTIPO VISUAL</span></footer>
+      </section>
+    </main>
+  </div>
+  <div class="modal-backdrop" id="taskModal" hidden><form class="modal" id="taskForm"><button type="button" class="modal-close" id="closeModal">×</button><div class="eyebrow">ORGANIZA TU TRABAJO</div><h2>Nueva tarea</h2><p class="muted">Añade una tarea de ejemplo a esta vista.</p><label for="taskTitle">Nombre de la tarea</label><input id="taskTitle" required maxlength="90" placeholder="Ej. Preparar reunión de equipo"><label for="taskProject">Proyecto</label><select id="taskProject"><option>Rediseño de plataforma</option><option>Portal de clientes</option><option>Campaña de lanzamiento</option></select><div class="modal-actions"><button type="button" class="secondary-btn" id="cancelModal">Cancelar</button><button class="primary-btn" type="submit">Crear tarea</button></div></form></div>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
