@@ -98,8 +98,12 @@ final class AuthService
 
         $errors = Validator::validate($input, [
             'email' => ['required', 'string', 'email', 'max:180'],
-            'password' => ['required', 'string'],
+            'password' => ['required', 'string', 'max:72'],
         ]);
+
+        if (is_string($input['password'] ?? null) && strlen($input['password']) > 72) {
+            $errors['password'][] = 'Password must not exceed 72 bytes.';
+        }
 
         if ($errors !== []) {
             throw ApiException::validation($errors);
