@@ -26,8 +26,9 @@ Never commit the real `.env` file.
 - Composer configuration and PSR-4 autoloading: scaffolded.
 - Environment loading: scaffolded with phpdotenv.
 - PDO connection factory: scaffolded; local connection not yet verified.
-- HTTP request abstraction and JSON response class: scaffolded.
-- Router and centralized exception handler: scaffolded.
+- HTTP request abstraction, JSON response class, and router: scaffolded.
+- Centralized exception handler with expected API error mapping: scaffolded.
+- Reusable input validator: scaffolded; automated tests not yet run.
 - Health endpoint: scaffolded; local HTTP response not yet verified.
 - Initial schema migration: drafted; not yet executed against MySQL.
 - Authentication and business endpoints: not implemented yet.
@@ -38,4 +39,4 @@ The backend source code is kept outside the public document root. Only files ins
 
 - `GET /api/v1/health` — basic API status response.
 
-See [API architecture](../docs/api-architecture.md) for the request lifecycle and response conventions.
+See [API architecture](../docs/api-architecture.md) for request flow, validation rules, and response conventions.
