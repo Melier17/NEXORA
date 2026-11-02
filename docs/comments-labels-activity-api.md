@@ -25,7 +25,7 @@ All workspace members can list labels and assign/remove labels on tasks. Only ow
 
 The endpoint returns newest activity first. `limit` defaults to 20 and accepts 1–100. `before_id` is an optional cursor for older records. The response decodes JSON metadata into an object.
 
-Activity is currently recorded for comment creation/deletion, label creation/edit/deletion, and label assignment/removal. Earlier workspace, project and task operations are not yet automatically logged; that integration is a follow-up task.
+Activity is recorded for project creation/updates, task creation/updates/deletion, comment creation/deletion, label creation/edit/deletion, and label assignment/removal. Workspace creation and membership changes are not yet automatically logged.
 
 ## Database
 The tables `comments`, `labels`, `task_labels` and `activity_logs` are already defined in `backend/database/migrations/001_create_core_tables.sql`. Apply migration 001 to a new database before using these endpoints. No additional migration is required for this module.
