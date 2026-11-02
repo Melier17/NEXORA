@@ -41,16 +41,25 @@ final class Router
             $normalizedPath = '/';
         }
 
-        $quoted = preg_quote($normalizedPath, '~');
-        $pattern = preg_replace_callback(
-            '~\\\\\{([a-zA-Z_][a-zA-Z0-9_]*)\\\\\}~',
-            static fn (array $matches): string => '(?P<' . $matches[1] . '>[^/]+)',
-            $quoted
-        );
+        $segments = trim($normalizedPath, '/') === ''
+            ? []
+            : explode('/', trim($normalizedPath, '/'));
+
+        $patternSegments = [];
+
+        foreach ($segments as $segment) {
+            if (preg_match('/^\{([a-zA-Z_][a-zA-Z0-9_]*)\}$/', $segment, $matches) === 1) {
+                $patternSegments[] = '(?P<' . $matches[1] . '>[^/]+)';
+            } else {
+                $patternSegments[] = preg_quote($segment, '~');
+            }
+        }
+
+        $pattern = '~^/' . implode('/', $patternSegments) . '/?$~';
 
         $this->routes[] = [
             'method' => $method,
-            'pattern' => '~^' . $pattern . '/?$~',
+            'pattern' => $pattern,
             'handler' => $handler,
         ];
     }
