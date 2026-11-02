@@ -7,31 +7,51 @@ PHP REST API foundation for NEXORA.
 - PHP 8.3+
 - MySQL 8.0.16+
 - Composer
-- Apache with `mod_rewrite` enabled (for the included XAMPP setup)
+- Apache with \`mod_rewrite\` enabled (for the included XAMPP setup)
 - PHP extensions: PDO, PDO MySQL, OpenSSL, and mbstring
 
 ## Local setup
 
-1. Create a MySQL database named `nexora_db` using `utf8mb4`.
-2. Copy `.env.example` to `.env` and adjust local values.
-3. From this directory, run `composer install`.
-4. Apply the SQL migrations in `database/migrations/` in numerical order.
-5. Configure Apache so the web document root points to `backend/public`.
-6. Request `/api/v1/health` to check the API entry point.
-7. Run `composer test` to execute the unit tests.
+1. Create a MySQL database named \`nexora_db\` using \`utf8mb4\`.
+2. Copy \`.env.example\` to \`.env\` and adjust local values.
+3. From this directory, run \`composer install\`.
+4. Apply the SQL migrations in \`database/migrations/\` in numerical order.
+5. Configure Apache so the web document root points to \`backend/public\`.
+6. Request \`/api/v1/health\` to check the API entry point.
+7. Run \`composer test\` to execute the unit tests.
 
-Never commit the real `.env` file.
+Never commit the real \`.env\` file.
 
 ## Authentication endpoints
 
-All endpoints use the `/api/v1` prefix and JSON request bodies.
+All endpoints use the \`/api/v1\` prefix and JSON request bodies.
 
-- `POST /api/v1/auth/register` — create an account using `name`, `email`, `password`, and `password_confirmation`.
-- `POST /api/v1/auth/login` — authenticate with `email` and `password`.
-- `GET /api/v1/auth/me` — return the current account.
-- `POST /api/v1/auth/logout` — revoke the current access token.
+- \`POST /api/v1/auth/register\` — create an account using \`name\`, \`email\`, \`password\`, and \`password_confirmation\`.
+- \`POST /api/v1/auth/login\` — authenticate with \`email\` and \`password\`.
+- \`GET /api/v1/auth/me\` — return the current account.
+- \`POST /api/v1/auth/logout\` — revoke the current access token.
 
-Send the access token in the `Authorization: Bearer <token>` header for the `me` and `logout` endpoints. Access tokens are random opaque values; only their SHA-256 hashes are stored in the database. The default lifetime is 60 minutes and can be changed with `ACCESS_TOKEN_TTL_MINUTES` (minimum 5 minutes).
+Send the access token in the \`Authorization: Bearer <token>\` header for protected endpoints. Access tokens are random opaque values; only their SHA-256 hashes are stored in the database. The default lifetime is 60 minutes and can be changed with \`ACCESS_TOKEN_TTL_MINUTES\` (minimum 5 minutes).
+
+## Workspace endpoints
+
+Every workspace endpoint requires an active Bearer access token.
+
+- \`GET /api/v1/workspaces\` — list workspaces where the authenticated user is a member.
+- \`POST /api/v1/workspaces\` — create a workspace; the creator becomes its owner.
+- \`GET /api/v1/workspaces/{workspaceId}\` — view a workspace if the caller belongs to it.
+- \`GET /api/v1/workspaces/{workspaceId}/members\` — list members.
+- \`POST /api/v1/workspaces/{workspaceId}/members\` — add an existing active user by email. Body: \`{"email":"person@example.com","role":"member"}\`. Owners can add admins or members; admins can add members only.
+- \`PATCH /api/v1/workspaces/{workspaceId}/members/{userId}\` — update a member role. Only owners can assign or remove the admin role.
+- \`DELETE /api/v1/workspaces/{workspaceId}/members/{userId}\` — remove a member, subject to role permissions.
+
+Roles:
+
+- \`owner\`: workspace creator; cannot be removed or demoted through member management.
+- \`admin\`: can add and remove regular members and view workspace members.
+- \`member\`: can view the workspace and its member list.
+
+The initial member-management flow adds an existing registered account by email; invitation emails and pending invitations are not implemented yet.
 
 ## Current implementation status
 
@@ -41,13 +61,14 @@ Send the access token in the `Authorization: Bearer <token>` header for the `me`
 - HTTP request abstraction, JSON response class, router, and validation layer: scaffolded.
 - Centralized exception handler with expected API error mapping: scaffolded.
 - Authentication: registration, login, current-user lookup, and token revocation endpoints scaffolded.
-- Passwords use PHP `password_hash()` and `password_verify()`.
-- Access tokens are generated with `random_bytes()`; only SHA-256 hashes are stored.
-- Authentication database migration: drafted; not yet executed against MySQL.
+- Workspace creation, listing, detail lookup, member listing, adding, role updates, and removal: scaffolded.
+- Passwords use PHP \`password_hash()\` and \`password_verify()\`.
+- Access tokens are generated with \`random_bytes()\`; only SHA-256 hashes are stored.
+- SQL migrations are drafted; they have not yet been executed against MySQL.
 - Validator unit tests are written; tests have not yet been executed.
-- Health and authentication endpoints: not yet verified locally.
-- Email verification, password reset, refresh-token rotation, login rate limiting, and automated auth integration tests are not implemented yet.
+- Health, authentication, and workspace endpoints are not yet verified locally.
+- Email verification, password reset, refresh-token rotation, login rate limiting, invitation emails, and automated integration tests are not implemented yet.
 
-The backend source code is kept outside the public document root. Only files inside `public/` should be served by Apache. Keep `APP_DEBUG=false` in production.
+The backend source code is kept outside the public document root. Only files inside \`public/\` should be served by Apache. Keep \`APP_DEBUG=false\` in production.
 
 See [API architecture](../docs/api-architecture.md) for request flow, validation rules, and response conventions.
