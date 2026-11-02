@@ -1,0 +1,18 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Allow direct access to existing files and directories.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Route all other requests through the API entry point.
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
+
+# Prevent access to hidden files.
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
