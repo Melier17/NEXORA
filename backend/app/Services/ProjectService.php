@@ -41,6 +41,7 @@ final class ProjectService
 
         $data = $this->validatedData($input, false);
         $projectId = $this->projects->create($workspaceId, $userId, $data);
+        $this->logActivity($workspaceId, $userId, $projectId, 'project.created', ['name' => $data['name']]);
 
         return $this->requireProject($workspaceId, $projectId);
     }
@@ -57,8 +58,24 @@ final class ProjectService
         }
 
         $this->projects->update($projectId, $workspaceId, $data);
+        $this->logActivity($workspaceId, $userId, $projectId, 'project.updated', ['fields' => array_keys($data)]);
 
         return $this->requireProject($workspaceId, $projectId);
+    }
+
+    private function logActivity(int $workspaceId, int $userId, int $projectId, string $action, array $metadata): void
+    {
+        $statement = $this->database->prepare(
+            'INSERT INTO activity_logs (workspace_id, actor_user_id, entity_type, entity_id, action, metadata)
+             VALUES (:workspace_id, :actor_user_id, "project", :entity_id, :action, :metadata)'
+        );
+        $statement->execute([
+            'workspace_id' => $workspaceId,
+            'actor_user_id' => $userId,
+            'entity_id' => $projectId,
+            'action' => $action,
+            'metadata' => json_encode($metadata, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+        ]);
     }
 
     private function validatedData(array $input, bool $partial): array
