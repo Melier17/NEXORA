@@ -96,8 +96,8 @@ final class CollaborationRepository
 
     public function listActivity(int $workspaceId,int $limit,int $beforeId): array
     {
-        $q=$this->database->prepare('SELECT a.id,a.actor_user_id,a.entity_type,a.entity_id,a.action,a.metadata,a.created_at,u.name AS actor_name FROM activity_logs a LEFT JOIN users u ON u.id=a.actor_user_id WHERE a.workspace_id=:workspace AND (:before_id=0 OR a.id<:before_id) ORDER BY a.id DESC LIMIT '.$limit);
-        $q->execute(['workspace'=>$workspaceId,'before_id'=>$beforeId]);
+        $q=$this->database->prepare('SELECT a.id,a.actor_user_id,a.entity_type,a.entity_id,a.action,a.metadata,a.created_at,u.name AS actor_name FROM activity_logs a LEFT JOIN users u ON u.id=a.actor_user_id WHERE a.workspace_id=:workspace AND (:before_id_filter=0 OR a.id<:before_id_value) ORDER BY a.id DESC LIMIT '.$limit);
+        $q->execute(['workspace'=>$workspaceId,'before_id_filter'=>$beforeId,'before_id_value'=>$beforeId]);
         return $q->fetchAll();
     }
 }
