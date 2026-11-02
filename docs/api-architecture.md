@@ -4,7 +4,7 @@
 
 Versioned endpoints use the prefix `/api/v1`.
 
-The first registered endpoint is:
+The initial endpoint is:
 
 - `GET /api/v1/health` — returns API status information.
 
@@ -17,6 +17,14 @@ The first registered endpoint is:
 5. The router matches the method and route.
 6. A controller handles the request and returns a response.
 7. The response object sends JSON with an HTTP status code.
+
+## Core components
+
+- `App\\Core\\Request`: captures and normalizes an HTTP request.
+- `App\\Core\\Router`: registers routes and dispatches matching requests.
+- `App\\Core\\Response`: sends JSON responses with status and headers.
+- `App\\Middleware\\ErrorHandler`: logs unexpected exceptions and returns a safe error response.
+- `App\\Controllers\\HealthController`: handles the initial health endpoint.
 
 ## JSON response convention
 
@@ -43,7 +51,7 @@ The exact fields may be extended when pagination and validation errors are imple
 
 ## Error handling
 
-Unexpected exceptions are logged on the server. Detailed exception information is only included when `APP_DEBUG=true`; keep debug mode disabled in production.
+Unexpected exceptions are logged on the server. Detailed exception information is only included when `APP_DEBUG=true`; keep debug mode disabled in production. Invalid JSON request bodies receive an HTTP 400 response.
 
 ## Security notes
 
@@ -52,3 +60,4 @@ Unexpected exceptions are logged on the server. Detailed exception information i
 - Never return password hashes, token hashes, secrets, or raw exception traces to clients.
 - Validate request data before calling services or repositories.
 - Use parameterized SQL through PDO.
+- Configure the production web root to `backend/public`, not the repository root.
