@@ -8,7 +8,7 @@ PHP REST API foundation for NEXORA.
 - MySQL 8.0.16+
 - Composer
 - Apache with `mod_rewrite` enabled (for the included XAMPP setup)
-- PHP extensions: PDO, PDO MySQL, and OpenSSL
+- PHP extensions: PDO, PDO MySQL, OpenSSL, and mbstring
 
 ## Local setup
 
@@ -18,6 +18,7 @@ PHP REST API foundation for NEXORA.
 4. Apply `database/migrations/001_create_core_tables.sql` to the development database.
 5. Configure Apache so the web document root points to `backend/public`.
 6. Request `/api/v1/health` to check the API entry point.
+7. Run `composer test` to execute the unit tests.
 
 Never commit the real `.env` file.
 
@@ -28,7 +29,8 @@ Never commit the real `.env` file.
 - PDO connection factory: scaffolded; local connection not yet verified.
 - HTTP request abstraction, JSON response class, and router: scaffolded.
 - Centralized exception handler with expected API error mapping: scaffolded.
-- Reusable input validator: scaffolded; automated tests not yet run.
+- Reusable input validator: scaffolded with unit tests written; tests not yet executed.
+- PHPUnit configuration: added; dependencies not yet installed locally.
 - Health endpoint: scaffolded; local HTTP response not yet verified.
 - Initial schema migration: drafted; not yet executed against MySQL.
 - Authentication and business endpoints: not implemented yet.
