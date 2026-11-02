@@ -59,6 +59,7 @@ final class CollaborationService
     public function createLabel(int $userId,int $workspaceId,array $input): array
     {
         $this->manager($userId,$workspaceId);$errors=Validator::validate($input,['name'=>['required','string','min:2','max:60'],'color'=>['string']]);
+        if(isset($input['name'])&&is_string($input['name'])&&trim($input['name'])==='')$errors['name'][]='Label name cannot be empty.';
         $color=$input['color']??'#64748b';
         if(!is_string($color)||preg_match('/^#[0-9a-fA-F]{6}$/',$color)!==1)$errors['color'][]='Use a hexadecimal color such as #64748b.';
         if($errors!==[])throw ApiException::validation($errors);
@@ -73,6 +74,7 @@ final class CollaborationService
         $this->manager($userId,$workspaceId);$this->label($labelId,$workspaceId);
         $errors=Validator::validate($input,['name'=>['string','min:2','max:60'],'color'=>['string']]);
         if($input===[])throw new ApiException('Provide at least one label field to update.',422);
+        if(isset($input['name'])&&is_string($input['name'])&&trim($input['name'])==='')$errors['name'][]='Label name cannot be empty.';
         if(array_key_exists('color',$input)&&(!is_string($input['color'])||preg_match('/^#[0-9a-fA-F]{6}$/',$input['color'])!==1))$errors['color'][]='Use a hexadecimal color such as #64748b.';
         if($errors!==[])throw ApiException::validation($errors);
         $data=[];if(array_key_exists('name',$input))$data['name']=trim($input['name']);if(array_key_exists('color',$input))$data['color']=$input['color'];
