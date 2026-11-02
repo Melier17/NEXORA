@@ -12,8 +12,6 @@ final class ErrorHandler
 {
     public static function handle(Throwable $exception): void
     {
-        error_log((string) $exception);
-
         if ($exception instanceof ApiException) {
             $payload = [
                 'success' => false,
@@ -27,6 +25,8 @@ final class ErrorHandler
             Response::json($payload, $exception->statusCode())->send();
             return;
         }
+
+        error_log((string) $exception);
 
         $debug = filter_var($_ENV['APP_DEBUG'] ?? false, FILTER_VALIDATE_BOOL);
 
