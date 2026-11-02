@@ -5,8 +5,6 @@ declare(strict_types=1);
 use App\Core\Request;
 use App\Middleware\ErrorHandler;
 use Dotenv\Dotenv;
-use InvalidArgumentException;
-use Throwable;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -20,11 +18,11 @@ try {
 
     $response = $router->dispatch($request);
     $response->send();
-} catch (InvalidArgumentException $exception) {
+} catch (\InvalidArgumentException $exception) {
     \App\Core\Response::json([
         'success' => false,
         'message' => $exception->getMessage(),
     ], 400)->send();
-} catch (Throwable $exception) {
+} catch (\Throwable $exception) {
     ErrorHandler::handle($exception);
 }
