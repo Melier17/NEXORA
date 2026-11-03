@@ -54,8 +54,8 @@ final class WorkspaceService
                 $userId
             );
             $this->workspaces->addMember($workspaceId, $userId, 'owner');
-            $this->database->commit();
             $this->logActivity($workspaceId, $userId, 'workspace', $workspaceId, 'workspace.created', ['name' => $name]);
+            $this->database->commit();
         } catch (\Throwable $exception) {
             if ($this->database->inTransaction()) {
                 $this->database->rollBack();
