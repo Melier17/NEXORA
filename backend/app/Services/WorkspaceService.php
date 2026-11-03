@@ -55,6 +55,7 @@ final class WorkspaceService
             );
             $this->workspaces->addMember($workspaceId, $userId, 'owner');
             $this->database->commit();
+            $this->logActivity($workspaceId, $userId, 'workspace', $workspaceId, 'workspace.created', ['name' => $name]);
         } catch (\Throwable $exception) {
             if ($this->database->inTransaction()) {
                 $this->database->rollBack();
@@ -130,6 +131,8 @@ final class WorkspaceService
             throw $exception;
         }
 
+        $this->logActivity($workspaceId, $actorId, 'member', (int) $user['id'], 'workspace.member_added', ['role' => $role, 'email' => $email]);
+
         return [
             'user' => $user,
             'role' => $role,
@@ -162,6 +165,7 @@ final class WorkspaceService
         }
 
         $this->workspaces->updateMemberRole($workspaceId, $targetUserId, $role);
+        $this->logActivity($workspaceId, $actorId, 'member', $targetUserId, 'workspace.member_role_updated', ['role' => $role]);
 
         return [
             'user_id' => $targetUserId,
@@ -185,6 +189,23 @@ final class WorkspaceService
         }
 
         $this->workspaces->removeMember($workspaceId, $targetUserId);
+        $this->logActivity($workspaceId, $actorId, 'member', $targetUserId, 'workspace.member_removed', ['previous_role' => $target['role']]);
+    }
+
+    private function logActivity(int $workspaceId, int $actorId, string $entityType, int $entityId, string $action, array $metadata): void
+    {
+        $statement = $this->database->prepare(
+            'INSERT INTO activity_logs (workspace_id, actor_user_id, entity_type, entity_id, action, metadata)
+             VALUES (:workspace_id, :actor_user_id, :entity_type, :entity_id, :action, :metadata)'
+        );
+        $statement->execute([
+            'workspace_id' => $workspaceId,
+            'actor_user_id' => $actorId,
+            'entity_type' => $entityType,
+            'entity_id' => $entityId,
+            'action' => $action,
+            'metadata' => json_encode($metadata, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+        ]);
     }
 
     private function requireMembership(int $userId, int $workspaceId): array
